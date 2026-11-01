@@ -31,9 +31,12 @@ h1,h2,h3,h4{font-family:Fraunces,Georgia,serif;font-weight:600;line-height:1.15}
 a{color:inherit;text-decoration:none}
 .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
 
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
 /* Buttons */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;cursor:pointer;border-radius:999px;padding:12px 28px;font:600 16px Manrope,sans-serif;background:var(--primary);color:var(--pfg);transition:.2s}
 .btn:hover{opacity:.9;transform:translateY(-1px)}.btn.lime{background:var(--lime);color:var(--afg)}
+.btn:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
 .btn-sm{padding:8px 20px;font-size:14px}
 
 /* Header */
@@ -103,10 +106,13 @@ ul.dots li:before{content:"";flex:none;width:8px;height:8px;border-radius:50%;ba
 
 /* Form */
 .opt{display:block;width:100%;text-align:left;background:none;color:inherit;font:inherit;cursor:pointer;border:1px solid rgba(238,246,236,.2);border-radius:18px;padding:20px;margin-bottom:14px;transition:.2s}
+.opt:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
 .opt.on{border-color:var(--lime);background:rgba(238,246,236,.09)}.opt small{display:block;opacity:.75;font-size:13.5px;margin-top:4px}
 form{background:rgba(238,246,236,.05);border-radius:26px;padding:32px;display:flex;flex-direction:column;gap:16px;border:1px solid rgba(238,246,236,.12)}
 .f{width:100%;border:1px solid rgba(238,246,236,.2);background:rgba(238,246,236,.06);color:var(--dfg);border-radius:14px;padding:12px 16px;font:inherit}
-.f::placeholder{color:rgba(238,246,236,.55)}.f:focus{outline:none;border-color:var(--lime)}
+.f::placeholder{color:rgba(238,246,236,.55)}
+.f:focus{outline:none;border-color:var(--lime)}
+.f:focus-visible{outline:2px solid var(--lime);outline-offset:1px}
 .err{color:#ff8a7a;font-size:14px}
 
 /* Footer */
@@ -400,12 +406,16 @@ footer a:hover{color:var(--primary)}
     </div>
   </div>
   <div id="formbox">
-    <form id="form">
-      <input class="f" name="name" placeholder="Your name" maxlength="100" required>
-      <input class="f" name="email" type="email" placeholder="Email address" maxlength="255" required>
+    <form id="form" novalidate>
+      <label class="sr-only" for="full-name">Your name</label>
+      <input class="f" id="full-name" name="name" placeholder="Your name" maxlength="100" required aria-required="true" aria-describedby="err">
+      <label class="sr-only" for="email-address">Email address</label>
+      <input class="f" id="email-address" name="email" type="email" placeholder="Email address" maxlength="255" required aria-required="true" aria-describedby="err">
+      <label class="sr-only" for="org">School or Institution (optional)</label>
       <input class="f" name="organization" id="org" placeholder="School or Institution (optional)" maxlength="150">
-      <textarea class="f" name="message" rows="4" placeholder="Your message or interests (optional)" maxlength="1000"></textarea>
-      <p class="err" id="err"></p>
+      <label class="sr-only" for="message">Your message or interests (optional)</label>
+      <textarea class="f" id="message" name="message" rows="4" placeholder="Your message or interests (optional)" maxlength="1000"></textarea>
+      <p class="err" id="err" role="alert" aria-live="polite"></p>
       <button class="btn lime" id="sub" style="width:100%">Join the Chapter</button>
     </form>
   </div>

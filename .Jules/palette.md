@@ -1,0 +1,3 @@
+## 2026-11-01 - Form Accessibility and Keyboard Navigation in Landing Pages
+**Learning:** Single-page static marketing sites often omit `<label>` tags in favor of visual placeholders and lack dynamic `aria-live` error regions. Adding visually-hidden accessible labels paired with `id`/`for` attributes and explicit `:focus-visible` ring outlines provides seamless assistive technology and keyboard navigation support without altering the visual aesthetic.
+**Action:** When auditing landing pages without dedicated UI component libraries, ensure form inputs have associated `<label class="sr-only">`, dynamic feedback containers use `aria-live="polite"`, and all interactive controls include high-contrast `:focus-visible` styling.
