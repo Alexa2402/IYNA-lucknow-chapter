@@ -101,12 +101,15 @@ ul.dots li:before{content:"";flex:none;width:8px;height:8px;border-radius:50%;ba
 .faq-box h4{font-size:18px;color:var(--fg);margin-bottom:8px}
 .faq-box p{font-size:14.5px;color:var(--muted);line-height:1.6}
 
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.btn:focus-visible,.opt:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+
 /* Form */
 .opt{display:block;width:100%;text-align:left;background:none;color:inherit;font:inherit;cursor:pointer;border:1px solid rgba(238,246,236,.2);border-radius:18px;padding:20px;margin-bottom:14px;transition:.2s}
 .opt.on{border-color:var(--lime);background:rgba(238,246,236,.09)}.opt small{display:block;opacity:.75;font-size:13.5px;margin-top:4px}
 form{background:rgba(238,246,236,.05);border-radius:26px;padding:32px;display:flex;flex-direction:column;gap:16px;border:1px solid rgba(238,246,236,.12)}
 .f{width:100%;border:1px solid rgba(238,246,236,.2);background:rgba(238,246,236,.06);color:var(--dfg);border-radius:14px;padding:12px 16px;font:inherit}
-.f::placeholder{color:rgba(238,246,236,.55)}.f:focus{outline:none;border-color:var(--lime)}
+.f::placeholder{color:rgba(238,246,236,.55)}.f:focus{outline:none;border-color:var(--lime)}.f:focus-visible{outline:2px solid var(--lime);outline-offset:1px}
 .err{color:#ff8a7a;font-size:14px}
 
 /* Footer */
@@ -384,16 +387,16 @@ footer a:hover{color:var(--primary)}
     <p class="eyebrow">Get Involved</p>
     <h2>Become part of Lucknow's neuroscience movement</h2>
     <p style="margin-top:16px;opacity:.8;max-width:480px">Select your role below and submit your details. We will reach out to you via email with updates and meeting invitations.</p>
-    <div style="margin-top:36px">
-      <button class="opt" data-k="student" onclick="pick('student')">
+    <div style="margin-top:36px" role="group" aria-label="Participation role options">
+      <button type="button" class="opt" data-k="student" aria-pressed="true" onclick="pick('student')">
         <b>Students</b>
         <small>Join our active chapter, attend workshops, and access study materials.</small>
       </button>
-      <button class="opt" data-k="school" onclick="pick('school')">
+      <button type="button" class="opt" data-k="school" aria-pressed="false" onclick="pick('school')">
         <b>Schools &amp; Organizations</b>
         <small>Host an interactive workshop or session at your institution.</small>
       </button>
-      <button class="opt" data-k="educator" onclick="pick('educator')">
+      <button type="button" class="opt" data-k="educator" aria-pressed="false" onclick="pick('educator')">
         <b>Researchers &amp; Educators</b>
         <small>Deliver a guest lecture, mentor members, or collaborate with us.</small>
       </button>
@@ -401,12 +404,16 @@ footer a:hover{color:var(--primary)}
   </div>
   <div id="formbox">
     <form id="form">
-      <input class="f" name="name" placeholder="Your name" maxlength="100" required>
-      <input class="f" name="email" type="email" placeholder="Email address" maxlength="255" required>
+      <label for="name" class="sr-only">Your name</label>
+      <input class="f" id="name" name="name" autocomplete="name" placeholder="Your name" maxlength="100" required>
+      <label for="email" class="sr-only">Email address</label>
+      <input class="f" id="email" name="email" type="email" autocomplete="email" placeholder="Email address" maxlength="255" required>
+      <label for="org" class="sr-only">School or Institution (optional)</label>
       <input class="f" name="organization" id="org" placeholder="School or Institution (optional)" maxlength="150">
-      <textarea class="f" name="message" rows="4" placeholder="Your message or interests (optional)" maxlength="1000"></textarea>
-      <p class="err" id="err"></p>
-      <button class="btn lime" id="sub" style="width:100%">Join the Chapter</button>
+      <label for="message" class="sr-only">Your message or interests (optional)</label>
+      <textarea class="f" id="message" name="message" rows="4" placeholder="Your message or interests (optional)" maxlength="1000"></textarea>
+      <p class="err" id="err" role="alert" aria-live="polite"></p>
+      <button type="submit" class="btn lime" id="sub" style="width:100%">Join the Chapter</button>
     </form>
   </div>
 </div></section>
@@ -431,7 +438,11 @@ const labels = {student: "Join the Chapter", school: "Invite Us", educator: "Get
 
 function pick(k, scroll){
   kind = k;
-  document.querySelectorAll(".opt").forEach(b => b.classList.toggle("on", b.dataset.k === k));
+  document.querySelectorAll(".opt").forEach(b => {
+    const isSelected = b.dataset.k === k;
+    b.classList.toggle("on", isSelected);
+    b.setAttribute("aria-pressed", isSelected ? "true" : "false");
+  });
   const sub = document.getElementById("sub"), org = document.getElementById("org");
   if(sub) sub.textContent = labels[k];
   if(org) org.placeholder = k === "student" ? "School or Grade (optional)" : "Institution / Organization";
