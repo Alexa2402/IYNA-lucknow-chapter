@@ -384,28 +384,28 @@ footer a:hover{color:var(--primary)}
     <p class="eyebrow">Get Involved</p>
     <h2>Become part of Lucknow's neuroscience movement</h2>
     <p style="margin-top:16px;opacity:.8;max-width:480px">Select your role below and submit your details. We will reach out to you via email with updates and meeting invitations.</p>
-    <div style="margin-top:36px">
-      <button class="opt" data-k="student" onclick="pick('student')">
+    <div style="margin-top:36px" role="group" aria-label="Select your role">
+      <button class="opt" data-k="student" aria-pressed="true" onclick="pick('student')">
         <b>Students</b>
         <small>Join our active chapter, attend workshops, and access study materials.</small>
       </button>
-      <button class="opt" data-k="school" onclick="pick('school')">
+      <button class="opt" data-k="school" aria-pressed="false" onclick="pick('school')">
         <b>Schools &amp; Organizations</b>
         <small>Host an interactive workshop or session at your institution.</small>
       </button>
-      <button class="opt" data-k="educator" onclick="pick('educator')">
+      <button class="opt" data-k="educator" aria-pressed="false" onclick="pick('educator')">
         <b>Researchers &amp; Educators</b>
         <small>Deliver a guest lecture, mentor members, or collaborate with us.</small>
       </button>
     </div>
   </div>
   <div id="formbox">
-    <form id="form">
-      <input class="f" name="name" placeholder="Your name" maxlength="100" required>
-      <input class="f" name="email" type="email" placeholder="Email address" maxlength="255" required>
-      <input class="f" name="organization" id="org" placeholder="School or Institution (optional)" maxlength="150">
-      <textarea class="f" name="message" rows="4" placeholder="Your message or interests (optional)" maxlength="1000"></textarea>
-      <p class="err" id="err"></p>
+    <form id="form" aria-label="Registration and inquiry form">
+      <input class="f" name="name" aria-label="Your full name" placeholder="Your name" maxlength="100" required aria-required="true">
+      <input class="f" name="email" type="email" aria-label="Email address" placeholder="Email address" maxlength="255" required aria-required="true">
+      <input class="f" name="organization" id="org" aria-label="School or Grade" placeholder="School or Grade (optional)" maxlength="150">
+      <textarea class="f" name="message" rows="4" aria-label="Your message or interests" placeholder="Your message or interests (optional)" maxlength="1000"></textarea>
+      <p class="err" id="err" role="alert" aria-live="polite"></p>
       <button class="btn lime" id="sub" style="width:100%">Join the Chapter</button>
     </form>
   </div>
@@ -431,10 +431,18 @@ const labels = {student: "Join the Chapter", school: "Invite Us", educator: "Get
 
 function pick(k, scroll){
   kind = k;
-  document.querySelectorAll(".opt").forEach(b => b.classList.toggle("on", b.dataset.k === k));
+  document.querySelectorAll(".opt").forEach(b => {
+    const isSelected = b.dataset.k === k;
+    b.classList.toggle("on", isSelected);
+    b.setAttribute("aria-pressed", isSelected ? "true" : "false");
+  });
   const sub = document.getElementById("sub"), org = document.getElementById("org");
   if(sub) sub.textContent = labels[k];
-  if(org) org.placeholder = k === "student" ? "School or Grade (optional)" : "Institution / Organization";
+  if(org) {
+    const orgLabel = k === "student" ? "School or Grade (optional)" : "Institution / Organization";
+    org.placeholder = orgLabel;
+    org.setAttribute("aria-label", orgLabel);
+  }
   if(scroll) document.getElementById("contact").scrollIntoView({behavior: "smooth"});
 }
 pick("student");
