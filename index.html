@@ -31,6 +31,12 @@ h1,h2,h3,h4{font-family:Fraunces,Georgia,serif;font-weight:600;line-height:1.15}
 a{color:inherit;text-decoration:none}
 .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
 
+/* Skip link & Focus indicators */
+.skip-link{position:absolute;top:-60px;left:20px;z-index:100;background:var(--lime);color:var(--afg);padding:10px 18px;border-radius:999px;font-weight:700;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,.25);transition:top .2s ease}
+.skip-link:focus{top:16px;outline:2px solid var(--fg);outline-offset:2px}
+a:focus-visible,button:focus-visible,.btn:focus-visible,.opt:focus-visible,.f:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+:not(.dark) a:focus-visible,:not(.dark) .btn:not(.lime):focus-visible{outline-color:var(--primary)}
+
 /* Buttons */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;cursor:pointer;border-radius:999px;padding:12px 28px;font:600 16px Manrope,sans-serif;background:var(--primary);color:var(--pfg);transition:.2s}
 .btn:hover{opacity:.9;transform:translateY(-1px)}.btn.lime{background:var(--lime);color:var(--afg)}
@@ -124,8 +130,9 @@ footer a:hover{color:var(--primary)}
 </style>
 </head>
 <body>
+<a href="#main-content" class="skip-link">Skip to main content</a>
 
-<header><nav class="wrap">
+<header><nav class="wrap" aria-label="Main Navigation">
   <a href="#" class="logo">🧠 IYNA Lucknow</a>
   <div class="links">
     <a href="#about">About</a>
@@ -138,6 +145,7 @@ footer a:hover{color:var(--primary)}
   <button class="btn btn-sm" onclick="pick('student',1)">Join Chapter</button>
 </nav></header>
 
+<main id="main-content">
 <!-- HERO SECTION -->
 <section class="hero">
   <div class="blob" style="right:-100px;top:-100px;width:420px;height:420px;background:rgba(201,236,91,.18)"></div>
@@ -384,16 +392,16 @@ footer a:hover{color:var(--primary)}
     <p class="eyebrow">Get Involved</p>
     <h2>Become part of Lucknow's neuroscience movement</h2>
     <p style="margin-top:16px;opacity:.8;max-width:480px">Select your role below and submit your details. We will reach out to you via email with updates and meeting invitations.</p>
-    <div style="margin-top:36px">
-      <button class="opt" data-k="student" onclick="pick('student')">
+    <div style="margin-top:36px" role="group" aria-label="Choose your role">
+      <button type="button" class="opt on" data-k="student" aria-pressed="true" onclick="pick('student')">
         <b>Students</b>
         <small>Join our active chapter, attend workshops, and access study materials.</small>
       </button>
-      <button class="opt" data-k="school" onclick="pick('school')">
+      <button type="button" class="opt" data-k="school" aria-pressed="false" onclick="pick('school')">
         <b>Schools &amp; Organizations</b>
         <small>Host an interactive workshop or session at your institution.</small>
       </button>
-      <button class="opt" data-k="educator" onclick="pick('educator')">
+      <button type="button" class="opt" data-k="educator" aria-pressed="false" onclick="pick('educator')">
         <b>Researchers &amp; Educators</b>
         <small>Deliver a guest lecture, mentor members, or collaborate with us.</small>
       </button>
@@ -410,6 +418,8 @@ footer a:hover{color:var(--primary)}
     </form>
   </div>
 </div></section>
+
+</main>
 
 <!-- FOOTER -->
 <footer><div class="wrap">
@@ -431,7 +441,11 @@ const labels = {student: "Join the Chapter", school: "Invite Us", educator: "Get
 
 function pick(k, scroll){
   kind = k;
-  document.querySelectorAll(".opt").forEach(b => b.classList.toggle("on", b.dataset.k === k));
+  document.querySelectorAll(".opt").forEach(b => {
+    const isSelected = b.dataset.k === k;
+    b.classList.toggle("on", isSelected);
+    b.setAttribute("aria-pressed", isSelected ? "true" : "false");
+  });
   const sub = document.getElementById("sub"), org = document.getElementById("org");
   if(sub) sub.textContent = labels[k];
   if(org) org.placeholder = k === "student" ? "School or Grade (optional)" : "Institution / Organization";
