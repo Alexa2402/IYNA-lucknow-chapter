@@ -35,6 +35,7 @@ a{color:inherit;text-decoration:none}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;cursor:pointer;border-radius:999px;padding:12px 28px;font:600 16px Manrope,sans-serif;background:var(--primary);color:var(--pfg);transition:.2s}
 .btn:hover{opacity:.9;transform:translateY(-1px)}.btn.lime{background:var(--lime);color:var(--afg)}
 .btn-sm{padding:8px 20px;font-size:14px}
+.btn:focus-visible,.opt:focus-visible{outline:2px solid var(--lime);outline-offset:3px}
 
 /* Header */
 header{position:sticky;top:0;z-index:30;background:rgba(242,248,240,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
@@ -104,9 +105,12 @@ ul.dots li:before{content:"";flex:none;width:8px;height:8px;border-radius:50%;ba
 /* Form */
 .opt{display:block;width:100%;text-align:left;background:none;color:inherit;font:inherit;cursor:pointer;border:1px solid rgba(238,246,236,.2);border-radius:18px;padding:20px;margin-bottom:14px;transition:.2s}
 .opt.on{border-color:var(--lime);background:rgba(238,246,236,.09)}.opt small{display:block;opacity:.75;font-size:13.5px;margin-top:4px}
-form{background:rgba(238,246,236,.05);border-radius:26px;padding:32px;display:flex;flex-direction:column;gap:16px;border:1px solid rgba(238,246,236,.12)}
+form{background:rgba(238,246,236,.05);border-radius:26px;padding:32px;display:flex;flex-direction:column;gap:14px;border:1px solid rgba(238,246,236,.12)}
+.field{display:flex;flex-direction:column;gap:6px}
+.lbl{font-size:13px;font-weight:600;color:var(--dfg);opacity:.9}
+.req{color:var(--lime)}
 .f{width:100%;border:1px solid rgba(238,246,236,.2);background:rgba(238,246,236,.06);color:var(--dfg);border-radius:14px;padding:12px 16px;font:inherit}
-.f::placeholder{color:rgba(238,246,236,.55)}.f:focus{outline:none;border-color:var(--lime)}
+.f::placeholder{color:rgba(238,246,236,.55)}.f:focus{outline:none;border-color:var(--lime);box-shadow:0 0 0 2px rgba(201,236,91,.25)}
 .err{color:#ff8a7a;font-size:14px}
 
 /* Footer */
@@ -384,28 +388,40 @@ footer a:hover{color:var(--primary)}
     <p class="eyebrow">Get Involved</p>
     <h2>Become part of Lucknow's neuroscience movement</h2>
     <p style="margin-top:16px;opacity:.8;max-width:480px">Select your role below and submit your details. We will reach out to you via email with updates and meeting invitations.</p>
-    <div style="margin-top:36px">
-      <button class="opt" data-k="student" onclick="pick('student')">
+    <div style="margin-top:36px" role="group" aria-label="Choose your role">
+      <button class="opt" data-k="student" aria-pressed="true" onclick="pick('student')">
         <b>Students</b>
         <small>Join our active chapter, attend workshops, and access study materials.</small>
       </button>
-      <button class="opt" data-k="school" onclick="pick('school')">
+      <button class="opt" data-k="school" aria-pressed="false" onclick="pick('school')">
         <b>Schools &amp; Organizations</b>
         <small>Host an interactive workshop or session at your institution.</small>
       </button>
-      <button class="opt" data-k="educator" onclick="pick('educator')">
+      <button class="opt" data-k="educator" aria-pressed="false" onclick="pick('educator')">
         <b>Researchers &amp; Educators</b>
         <small>Deliver a guest lecture, mentor members, or collaborate with us.</small>
       </button>
     </div>
   </div>
   <div id="formbox">
-    <form id="form">
-      <input class="f" name="name" placeholder="Your name" maxlength="100" required>
-      <input class="f" name="email" type="email" placeholder="Email address" maxlength="255" required>
-      <input class="f" name="organization" id="org" placeholder="School or Institution (optional)" maxlength="150">
-      <textarea class="f" name="message" rows="4" placeholder="Your message or interests (optional)" maxlength="1000"></textarea>
-      <p class="err" id="err"></p>
+    <form id="form" aria-label="Registration and Contact Form">
+      <div class="field">
+        <label for="name" class="lbl">Full Name <span class="req" aria-hidden="true">*</span></label>
+        <input class="f" id="name" name="name" placeholder="e.g. Ananya Sharma" maxlength="100" required autocomplete="name">
+      </div>
+      <div class="field">
+        <label for="email" class="lbl">Email Address <span class="req" aria-hidden="true">*</span></label>
+        <input class="f" id="email" name="email" type="email" placeholder="you@example.com" maxlength="255" required autocomplete="email">
+      </div>
+      <div class="field">
+        <label for="org" class="lbl" id="org-lbl">School or Grade <span style="opacity:.65;font-weight:400">(optional)</span></label>
+        <input class="f" name="organization" id="org" placeholder="e.g. City Montessori School, Grade 11" maxlength="150">
+      </div>
+      <div class="field">
+        <label for="message" class="lbl">Message or Interests <span style="opacity:.65;font-weight:400">(optional)</span></label>
+        <textarea class="f" id="message" name="message" rows="3" placeholder="Tell us about your interests in neuroscience..." maxlength="1000"></textarea>
+      </div>
+      <p class="err" id="err" role="alert" aria-live="polite"></p>
       <button class="btn lime" id="sub" style="width:100%">Join the Chapter</button>
     </form>
   </div>
@@ -431,10 +447,15 @@ const labels = {student: "Join the Chapter", school: "Invite Us", educator: "Get
 
 function pick(k, scroll){
   kind = k;
-  document.querySelectorAll(".opt").forEach(b => b.classList.toggle("on", b.dataset.k === k));
-  const sub = document.getElementById("sub"), org = document.getElementById("org");
+  document.querySelectorAll(".opt").forEach(b => {
+    const isSelected = b.dataset.k === k;
+    b.classList.toggle("on", isSelected);
+    b.setAttribute("aria-pressed", isSelected ? "true" : "false");
+  });
+  const sub = document.getElementById("sub"), org = document.getElementById("org"), orgLbl = document.getElementById("org-lbl");
   if(sub) sub.textContent = labels[k];
-  if(org) org.placeholder = k === "student" ? "School or Grade (optional)" : "Institution / Organization";
+  if(orgLbl) orgLbl.innerHTML = k === "student" ? 'School or Grade <span style="opacity:.65;font-weight:400">(optional)</span>' : 'Institution or Organization <span style="opacity:.65;font-weight:400">(optional)</span>';
+  if(org) org.placeholder = k === "student" ? "e.g. City Montessori School, Grade 11" : "e.g. Lucknow Public School / CDRI";
   if(scroll) document.getElementById("contact").scrollIntoView({behavior: "smooth"});
 }
 pick("student");
