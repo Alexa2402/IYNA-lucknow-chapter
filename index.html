@@ -31,9 +31,13 @@ h1,h2,h3,h4{font-family:Fraunces,Georgia,serif;font-weight:600;line-height:1.15}
 a{color:inherit;text-decoration:none}
 .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
 
+/* Accessibility helper */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
 /* Buttons */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;cursor:pointer;border-radius:999px;padding:12px 28px;font:600 16px Manrope,sans-serif;background:var(--primary);color:var(--pfg);transition:.2s}
 .btn:hover{opacity:.9;transform:translateY(-1px)}.btn.lime{background:var(--lime);color:var(--afg)}
+.btn:focus-visible,.opt:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
 .btn-sm{padding:8px 20px;font-size:14px}
 
 /* Header */
@@ -384,16 +388,16 @@ footer a:hover{color:var(--primary)}
     <p class="eyebrow">Get Involved</p>
     <h2>Become part of Lucknow's neuroscience movement</h2>
     <p style="margin-top:16px;opacity:.8;max-width:480px">Select your role below and submit your details. We will reach out to you via email with updates and meeting invitations.</p>
-    <div style="margin-top:36px">
-      <button class="opt" data-k="student" onclick="pick('student')">
+    <div style="margin-top:36px" role="radiogroup" aria-label="Select your role">
+      <button type="button" role="radio" aria-checked="true" class="opt" data-k="student" onclick="pick('student')">
         <b>Students</b>
         <small>Join our active chapter, attend workshops, and access study materials.</small>
       </button>
-      <button class="opt" data-k="school" onclick="pick('school')">
+      <button type="button" role="radio" aria-checked="false" class="opt" data-k="school" onclick="pick('school')">
         <b>Schools &amp; Organizations</b>
         <small>Host an interactive workshop or session at your institution.</small>
       </button>
-      <button class="opt" data-k="educator" onclick="pick('educator')">
+      <button type="button" role="radio" aria-checked="false" class="opt" data-k="educator" onclick="pick('educator')">
         <b>Researchers &amp; Educators</b>
         <small>Deliver a guest lecture, mentor members, or collaborate with us.</small>
       </button>
@@ -401,11 +405,15 @@ footer a:hover{color:var(--primary)}
   </div>
   <div id="formbox">
     <form id="form">
-      <input class="f" name="name" placeholder="Your name" maxlength="100" required>
-      <input class="f" name="email" type="email" placeholder="Email address" maxlength="255" required>
+      <label for="name" class="sr-only">Your Name</label>
+      <input class="f" id="name" name="name" placeholder="Your name" maxlength="100" required>
+      <label for="email" class="sr-only">Email Address</label>
+      <input class="f" id="email" name="email" type="email" placeholder="Email address" maxlength="255" required>
+      <label for="org" class="sr-only">School or Institution</label>
       <input class="f" name="organization" id="org" placeholder="School or Institution (optional)" maxlength="150">
-      <textarea class="f" name="message" rows="4" placeholder="Your message or interests (optional)" maxlength="1000"></textarea>
-      <p class="err" id="err"></p>
+      <label for="message" class="sr-only">Message or Interests</label>
+      <textarea class="f" id="message" name="message" rows="4" placeholder="Your message or interests (optional)" maxlength="1000"></textarea>
+      <p class="err" id="err" role="alert" aria-live="polite"></p>
       <button class="btn lime" id="sub" style="width:100%">Join the Chapter</button>
     </form>
   </div>
@@ -431,7 +439,11 @@ const labels = {student: "Join the Chapter", school: "Invite Us", educator: "Get
 
 function pick(k, scroll){
   kind = k;
-  document.querySelectorAll(".opt").forEach(b => b.classList.toggle("on", b.dataset.k === k));
+  document.querySelectorAll(".opt").forEach(b => {
+    const isSelected = b.dataset.k === k;
+    b.classList.toggle("on", isSelected);
+    b.setAttribute("aria-checked", isSelected ? "true" : "false");
+  });
   const sub = document.getElementById("sub"), org = document.getElementById("org");
   if(sub) sub.textContent = labels[k];
   if(org) org.placeholder = k === "student" ? "School or Grade (optional)" : "Institution / Organization";
